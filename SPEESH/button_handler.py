@@ -9,6 +9,7 @@ import evdev
 import os
 import time
 from threading import Thread
+import subprocess
 
 from pattern import Singleton
 
@@ -23,11 +24,14 @@ class Watcher(metaclass=Singleton):
     self.device = evdev.InputDevice(device_path)
     self.device_path = device_path
 
+  def _start_recording(self):
+    
+
   def _watcher_thread_target(self):
     for event in self.device.read_loop():
       if event.type == evdev.ecodes.EV_KEY:
         if (time.time() - Watcher.event_timestamp) > Watcher.MIN_DELAY:
-          print("pressed")
+          self._start_recording()
         Watcher.event_timestamp = time.time()
 
   def start_watcher(self):
