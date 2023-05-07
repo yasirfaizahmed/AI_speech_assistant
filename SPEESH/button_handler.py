@@ -9,10 +9,12 @@ import evdev
 import os
 import time
 from threading import Thread
-import subprocess
 
 from pattern import Singleton
-# from record import Record
+from record import Record
+from request_handler import speech_to_text, ask_openai
+
+CONFIDENCE_THRESHOLD = 0.5
 
 
 class Watcher(metaclass=Singleton):
@@ -25,21 +27,27 @@ class Watcher(metaclass=Singleton):
     self.device = evdev.InputDevice(device_path)
     self.device_path = device_path
 
-  def _start_recording(self):
-    # Record()
-    subprocess.Popen(["/home/xd/Documents/python_codes/AI_speesh_assistant/bin/python3", "/home/xd/Documents/python_codes/AI_speesh_assistant/SPEESH/record.py"], user='xd')
+  def _start_processing(self):
+    response = Record(_run_init=True)
+    if response.result is True:
+      transcript, confidence = speech_to_text(audio_file=response.audio_file)
+      if confidence > CONFIDENCE_THRESHOLD:
+        ai_response : str = ask_openai(user_prompt=transcript)
+        print(ai_response)
+        
 
   def _watcher_thread_target(self):
     for event in self.device.read_loop():
       if event.type == evdev.ecodes.EV_KEY:
         if (time.time() - Watcher.event_timestamp) > Watcher.MIN_DELAY:
           print("Pressed")
-          self._start_recording()
+          self._start_processing()
         Watcher.event_timestamp = time.time()
 
   def start_watcher(self):
     watcher_thread = Thread(target=self._watcher_thread_target)
     watcher_thread.start()
+    print("Watcher started")
     watcher_thread.join()
 
 

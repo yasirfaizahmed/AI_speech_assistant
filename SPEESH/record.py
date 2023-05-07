@@ -7,16 +7,18 @@ import os
 from pattern import Singleton
 
 
-FORMAT = pyaudio.paInt16
-CHANNELS = 1
 # Audio recording parameters
-RATE = 16000
-CHUNK = int(RATE / 10)  # 100ms
+FORMAT = pyaudio.paInt16
+CHANNELS = 2
+RATE = 44100
+CHUNK = 1024
 RECORD_SECONDS = 5
 
 
 class Record(metaclass=Singleton):
-  def __init__(self, duration: int = RECORD_SECONDS):
+  def __init__(self, duration: int = RECORD_SECONDS, **kwargs):
+    self.result = False
+    self.audio_file = ''
     audio = pyaudio.PyAudio()
     frames = []
 
@@ -44,6 +46,8 @@ class Record(metaclass=Singleton):
     waveFile.writeframes(b''.join(frames))
     waveFile.close()
 
+    self.result = True
+
   def _prepare_audio_archive(self) -> str:
     # handling the archive dir
     _audio_dir = os.path.normpath(os.path.join(os.path.dirname(__file__), '../_AUDIOs'))
@@ -51,7 +55,7 @@ class Record(metaclass=Singleton):
       os.mkdir(_audio_dir)
     _current_time = time.strftime("%H-%M-%S", time.localtime())
     _current_date = date.today().strftime("%B-%d-%Y")
-    return '_AUDIOs/{}_{}.wav'.format(_current_date, _current_time)
+    return '_AUDIOs/{}_{}.flac'.format(_current_date, _current_time)
 
 
 if __name__ == '__main__':
