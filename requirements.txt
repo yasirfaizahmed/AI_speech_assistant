@@ -4,3 +4,4 @@ google-cloud-speech
 google-cloud-texttospeech
 evdev
 openai
+pydub

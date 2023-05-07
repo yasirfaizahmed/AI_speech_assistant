@@ -5,6 +5,9 @@ Date: May 6, 2023
 Description: SPEECH is an assistant powered by google-cloud, OpenAI APIs.
 """
 
+import sys
+import os
+
 
 class Singleton(type):
   instances = {}
@@ -20,3 +23,16 @@ class Singleton(type):
         cls.instances[cls].__init__(*args, **kwargs)
 
     return cls.instances[cls]
+
+
+class SuppressOutput:
+  """
+  A context manager to temporarily suppress stderr output.
+  """
+  def __enter__(self):
+    self._stderr = sys.stderr
+    sys.stderr = open(os.devnull, 'w')
+
+  def __exit__(self, exc_type, exc_val, exc_tb):
+    sys.stderr.close()
+    sys.stderr = self._stderr

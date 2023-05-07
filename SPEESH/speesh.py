@@ -5,12 +5,13 @@ Date: May 6, 2023
 Description: SPEECH is an assistant powered by google-cloud, OpenAI APIs.
 """
 
-from button_handler import Watcher
+from handler import Watcher
+from configs import Config
 
 
-class Speesh():
+class Speesh(Config):
   def __init__(self):
-    self.watcher = Watcher(device_path='/dev/input/event15')
+    self.watcher = Watcher(device_path=self.EVENT_FILE).start_watcher()
 
 
 if __name__ == '__main__':

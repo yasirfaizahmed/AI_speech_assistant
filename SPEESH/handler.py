@@ -1,6 +1,6 @@
 """
 File: speesh.py
-Author: yaseer faiz ahmedpatterns
+Author: yaseer faiz ahmed
 Date: May 6, 2023
 Description: SPEECH is an assistant powered by google-cloud, OpenAI APIs.
 """
@@ -11,8 +11,8 @@ import time
 from threading import Thread
 
 from pattern import Singleton
-from record import Record
-from request_handler import speech_to_text, ask_openai, text_to_speech, play_audio
+from audio_util import Record, play_audio
+from request_util import Request
 
 CONFIDENCE_THRESHOLD = 0.5
 
@@ -27,29 +27,31 @@ class Watcher(metaclass=Singleton):
     self.device = evdev.InputDevice(device_path)
     self.device_path = device_path
 
-  def _start_processing(self):
-    response = Record(_run_init=True)
-    if response.result is True:
-      transcript, confidence = speech_to_text(audio_file=response.audio_file)
-      if confidence > CONFIDENCE_THRESHOLD:
-        ai_response : str = ask_openai(user_prompt=transcript)
-        print(ai_response)
-        mp3_file = text_to_speech(ai_response)
-        play_audio(audio_file=mp3_file)
+    # Request instance for google, openai client requests
+    self.request = Request()
 
+  def _start_processing(self):
+    record_response = Record(_run_init=True)
+    if record_response.result is True:
+      transcript, confidence = self.request.speech_to_text(audio_file=record_response.audio_input_file)
+      if confidence > CONFIDENCE_THRESHOLD:
+        ai_response: str = self.request.ask_openai(user_prompt=transcript)
+        print('################   ', ai_response)
+        mp3_ouput_file = self.request.text_to_speech(ai_response)
+        play_audio(audio_file=mp3_ouput_file)
 
   def _watcher_thread_target(self):
     for event in self.device.read_loop():
       if event.type == evdev.ecodes.EV_KEY:
         if (time.time() - Watcher.event_timestamp) > Watcher.MIN_DELAY:
-          print("Pressed")
+          print("################   Pressed")
           self._start_processing()
         Watcher.event_timestamp = time.time()
 
   def start_watcher(self):
     watcher_thread = Thread(target=self._watcher_thread_target)
     watcher_thread.start()
-    print("Watcher started")
+    print("################   Watcher started")
     watcher_thread.join()
 
 
