@@ -12,7 +12,7 @@ from threading import Thread
 
 from pattern import Singleton
 from record import Record
-from request_handler import speech_to_text, ask_openai
+from request_handler import speech_to_text, ask_openai, text_to_speech, play_audio
 
 CONFIDENCE_THRESHOLD = 0.5
 
@@ -34,7 +34,9 @@ class Watcher(metaclass=Singleton):
       if confidence > CONFIDENCE_THRESHOLD:
         ai_response : str = ask_openai(user_prompt=transcript)
         print(ai_response)
-        
+        mp3_file = text_to_speech(ai_response)
+        play_audio(audio_file=mp3_file)
+
 
   def _watcher_thread_target(self):
     for event in self.device.read_loop():
