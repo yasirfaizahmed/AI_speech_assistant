@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 *.pyo
 _AUDIOs/
+bin/
+lib/
+pyvenv.cfg
+./vscode

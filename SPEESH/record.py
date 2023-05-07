@@ -8,9 +8,10 @@ from pattern import Singleton
 
 
 FORMAT = pyaudio.paInt16
-CHANNELS = 2
-RATE = 44100
-CHUNK = 1024
+CHANNELS = 1
+# Audio recording parameters
+RATE = 16000
+CHUNK = int(RATE / 10)  # 100ms
 RECORD_SECONDS = 5
 
 
@@ -20,12 +21,13 @@ class Record(metaclass=Singleton):
     frames = []
 
     # start Recording
+    print("Recording")
     stream = audio.open(format=FORMAT, channels=CHANNELS,
                         rate=RATE, input=True,
                         frames_per_buffer=CHUNK)
 
     for _ in range(0, int(RATE / CHUNK * duration)):
-      data = stream.read(CHUNK)
+      data = stream.read(CHUNK, exception_on_overflow=False)
       frames.append(data)
 
     # stop Recording
@@ -34,8 +36,8 @@ class Record(metaclass=Singleton):
     audio.terminate()
 
     # save the file
-    audio_file = self._prepare_audio_archive()
-    waveFile = wave.open(audio_file, 'wb')
+    self.audio_file = self._prepare_audio_archive()
+    waveFile = wave.open(self.audio_file, 'wb')
     waveFile.setnchannels(CHANNELS)
     waveFile.setsampwidth(audio.get_sample_size(FORMAT))
     waveFile.setframerate(RATE)

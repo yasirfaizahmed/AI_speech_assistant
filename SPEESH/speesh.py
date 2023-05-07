@@ -12,9 +12,6 @@ class Speesh():
   def __init__(self):
     self.watcher = Watcher(device_path='/dev/input/event15')
 
-  
-
-
 
 if __name__ == '__main__':
-  speech()
+  Speesh()
