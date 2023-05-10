@@ -1,4 +1,6 @@
-# Project README
+# AI speech assistant
+
+[![flake8](https://github.com/yasirfaizahmed/AI_speech_assistant/actions/workflows/flake8.yml/badge.svg)](https://github.com/yasirfaizahmed/AI_speech_assistant/actions/workflows/flake8.yml)
 
 ## Overview
 This project is a powerful combination of OpenAI's state-of-the-art GPT technology and the advanced Google Cloud Speech API. It enables users to easily convert speech to text and back, all with the click of a customizable key.
