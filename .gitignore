@@ -1,6 +1,7 @@
 __pycache__/
 *.pyc
 *.pyo
+_LOGs/
 _AUDIOs/
 bin/
 lib/

@@ -11,17 +11,17 @@ import time
 from threading import Thread
 
 from pattern import Singleton
-from audio_util import Record, play_audio
+from audio_util import AudioUtil
 from request_util import Request
+from base import Base
 
-CONFIDENCE_THRESHOLD = 0.5
 
-
-class Watcher(metaclass=Singleton):
+class Watcher(Base, metaclass=Singleton):
   MIN_DELAY = 6
   event_timestamp = 0.0
 
   def __init__(self, device_path: str):
+    super().__init__()
     if os.path.exists(device_path) is False:
       return
     self.device = evdev.InputDevice(device_path)
@@ -31,27 +31,29 @@ class Watcher(metaclass=Singleton):
     self.request = Request()
 
   def _start_processing(self):
-    record_response = Record(_run_init=True)
-    if record_response.result is True:
-      transcript, confidence = self.request.speech_to_text(audio_file=record_response.audio_input_file)
-      if confidence > CONFIDENCE_THRESHOLD:
+    audio_util = AudioUtil(_run_init=True)
+    record_response = audio_util.start_record()
+    if record_response is True:
+      transcript, confidence = self.request.speech_to_text(audio_file=audio_util.audio_input_file)
+      self.logger.info("Confidence: {} Transcript: {}".format(confidence, transcript))
+      if confidence > self.CONFIDENCE_THRESHOLD:
         ai_response: str = self.request.ask_openai(user_prompt=transcript)
-        print('################   ', ai_response)
+        self.logger.info("AI_RESPONSE: {}".format(ai_response))
         mp3_ouput_file = self.request.text_to_speech(ai_response)
-        play_audio(audio_file=mp3_ouput_file)
+        audio_util.play_audio(audio_file=mp3_ouput_file)
 
   def _watcher_thread_target(self):
     for event in self.device.read_loop():
       if event.type == evdev.ecodes.EV_KEY:
         if (time.time() - Watcher.event_timestamp) > Watcher.MIN_DELAY:
-          print("################   Pressed")
+          self.logger.info("Listening...")
           self._start_processing()
         Watcher.event_timestamp = time.time()
 
   def start_watcher(self):
     watcher_thread = Thread(target=self._watcher_thread_target)
     watcher_thread.start()
-    print("################   Watcher started")
+    self.logger.info("Watcher Started")
     watcher_thread.join()
 
 

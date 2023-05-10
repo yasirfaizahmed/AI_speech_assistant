@@ -11,7 +11,7 @@ from google.cloud import speech_v1p1beta1 as speech
 import openai as ai
 from google.cloud import texttospeech
 
-from audio_util import calibrate_audio_file_path
+from audio_util import AudioUtil
 
 # Audio recording parameters
 CHANNELS = 2
@@ -57,7 +57,7 @@ class Request():
   def ask_openai(self, user_prompt: str,
                  engine='text-davinci-003',
                  temperature=0.5,
-                 max_tokens=50) -> str:
+                 max_tokens=100) -> str:
     # secret key
     secret = os.environ['API_KEY']
     ai.api_key = secret
@@ -91,7 +91,7 @@ class Request():
         input=synthesis_input, voice=voice, audio_config=audio_config
     )
 
-    audio_file = calibrate_audio_file_path(mode='out', format='mp3')
+    audio_file = AudioUtil()._calibrate_audio_file_path(mode='out', format='mp3')
 
     # The response's audio_content is binary.
     with open(audio_file, "wb") as out:

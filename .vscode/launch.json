@@ -7,7 +7,7 @@
         {
             "name": "Python: Current File",
             "type": "python",
-            "sudo": true,
+            // "sudo": true,
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
