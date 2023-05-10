@@ -31,7 +31,7 @@ class Watcher(Base, metaclass=Singleton):
     self.request = Request()
 
   def _start_processing(self):
-    audio_util = AudioUtil(_run_init=True)
+    audio_util = AudioUtil()
     record_response = audio_util.start_record()
     if record_response is True:
       transcript, confidence = self.request.speech_to_text(audio_file=audio_util.audio_input_file)
@@ -41,6 +41,7 @@ class Watcher(Base, metaclass=Singleton):
         self.logger.info("AI_RESPONSE: {}".format(ai_response))
         mp3_ouput_file = self.request.text_to_speech(ai_response)
         audio_util.play_audio(audio_file=mp3_ouput_file)
+    self.logger.info("Watcher Started")
 
   def _watcher_thread_target(self):
     for event in self.device.read_loop():

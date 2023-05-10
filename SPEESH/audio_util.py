@@ -11,7 +11,6 @@ import wave
 import time
 from datetime import date
 import os
-import sys
 from pydub import AudioSegment
 
 from pattern import Singleton, SuppressOutput
@@ -24,19 +23,17 @@ RECORD_SECONDS = 5
 class AudioUtil(Base, metaclass=Singleton):
   def __init__(self, **kwargs):
     super().__init__()
+    with SuppressOutput() as _:
+      self.audio = pyaudio.PyAudio()
 
   def start_record(self, duration: int = RECORD_SECONDS):
     self.audio_input_file = self._prepare_audio_archive()
     frames = []
 
     # start Recording
-    with SuppressOutput() as _:
-      sys.stderr = open(os.devnull, 'w')
-      audio = pyaudio.PyAudio()
-      sys.stderr.close()
-      stream = audio.open(format=self.FORMAT, channels=self.CHANNELS,
-                          rate=self.RATE, input=True,
-                          frames_per_buffer=self.CHUNK)
+    stream = self.audio.open(format=self.FORMAT, channels=self.CHANNELS,
+                             rate=self.RATE, input=True,
+                             frames_per_buffer=self.CHUNK)
 
     for _ in range(0, int(self.RATE / self.CHUNK * duration)):
       data = stream.read(self.CHUNK, exception_on_overflow=False)
@@ -45,12 +42,12 @@ class AudioUtil(Base, metaclass=Singleton):
     # stop Recording
     stream.stop_stream()
     stream.close()
-    audio.terminate()
+    # self.audio.terminate()
 
     # save the file
     waveFile = wave.open(self.audio_input_file, 'wb')
     waveFile.setnchannels(self.CHANNELS)
-    waveFile.setsampwidth(audio.get_sample_size(self.FORMAT))
+    waveFile.setsampwidth(self.audio.get_sample_size(self.FORMAT))
     waveFile.setframerate(self.RATE)
     waveFile.writeframes(b''.join(frames))
     waveFile.close()

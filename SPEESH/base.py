@@ -1,3 +1,11 @@
+"""
+File: speesh.py
+Author: yaseer faiz ahmed
+Date: May 6, 2023
+Description: SPEECH is an assistant powered by google-cloud, OpenAI APIs.
+"""
+
+
 from log_handler import InitilizeLogger
 import logging
 
