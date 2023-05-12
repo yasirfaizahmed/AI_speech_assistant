@@ -20,7 +20,24 @@ This project is built on top of cutting-edge technologies, including:
 - Audio output is generated using high-quality text-to-speech (TTS) libraries and APIs.
 
 ## Getting Started
-To get started with this project, simply clone the repository and run the setup script. You will need to have an active Google Cloud account and API key, as well as an OpenAI API key.
+Update the apt
+`sudo apt update && cd AI_speech_assistant`
+
+Install the package dependencies
+`sudo apt-get install $(cat package.txt)`
+
+Install the pip dependencies
+`python3 -m pip install -r requirements.txt`
+
+Make sure the mic is in working condition, set the sensitivity accordingly, by using tool like `pulseaudio`
+plug the headphone jack, make sure the headphone has the mic button (button used to hangup call or pause music when pressed)
+
+Set the Openai's GPT key as environmental varaible
+`export API_KEY='your-key'`
+
+Download the google-speech-to-text API key .json file and set the path of this file as environmental variable
+`export GOOGLE_APPLICATION_CREDENTIALS='/path/to/secret.json'`
+
 
 ## Conclusion
 Overall, this project is a powerful tool for anyone who needs to convert speech to text and back with minimal hassle. It leverages cutting-edge technologies to provide a seamless user experience and highly accurate results.
